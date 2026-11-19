@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Iconsmith: a free, open source icon maker. Turn images, emoji and text into macOS, iOS, Android, Windows and web icons.">
+  <title>Iconsmith</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='15' fill='%232783DE'/%3E%3Cpath d='M32 14l4.5 13.5L50 32l-13.5 4.5L32 50l-4.5-13.5L14 32l13.5-4.5z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="15" fill="currentColor"/><path d="M32 14l4.5 13.5L50 32l-13.5 4.5L32 50l-4.5-13.5L14 32l13.5-4.5z" fill="#fff"/></svg>
+      <div>
+        <h1>Iconsmith</h1>
+        <p class="tagline">Free, open source icon maker</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" id="resetBtn" class="btn ghost">Reset style</button>
+      <label class="btn primary" for="fileInput">Open images</label>
+      <input id="fileInput" class="visually-hidden" type="file" accept="image/*,.svg" multiple>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="stage-col">
+      <section class="card stage" aria-label="Preview">
+        <div class="stage-toolbar">
+          <div class="seg" role="radiogroup" aria-label="Preview background">
+            <label><input type="radio" name="previewBg" value="light" checked><span>Light</span></label>
+            <label><input type="radio" name="previewBg" value="dark"><span>Dark</span></label>
+            <label><input type="radio" name="previewBg" value="grid"><span>Grid</span></label>
+          </div>
+          <div class="source-meta">
+            <span id="sourceName" class="muted"></span>
+            <button type="button" id="removeCurrent" class="icon-btn" aria-label="Remove this image" hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="dropZone" class="drop-zone" data-bg="light">
+          <canvas id="preview" role="img" aria-label="Icon preview"></canvas>
+          <div id="emptyHint" class="empty-hint">
+            <strong>Drop an image here</strong>
+            <span>Or paste one, or choose Open images. PNG, JPG, SVG, WebP and GIF work.</span>
+          </div>
+        </div>
+        <div class="sizes" id="sizeStrip" aria-label="Actual size previews"></div>
+      </section>
+
+      <section class="card batch" id="batchCard" hidden aria-labelledby="batchTitle">
+        <div class="card-head">
+          <h2 id="batchTitle">Batch</h2>
+          <span id="batchCount" class="muted"></span>
+        </div>
+        <ul id="batchList" class="batch-list"></ul>
+        <div class="row">
+          <label class="inline-field">Format
+            <select id="batchFormat">
+              <option value="icns">macOS .icns</option>
+              <option value="ico">Windows .ico</option>
+              <option value="iconset">Iconset</option>
+              <option value="png">PNG</option>
+              <option value="pngset">PNG sizes</option>
+              <option value="all">Everything</option>
+            </select>
+          </label>
+          <button type="button" id="batchExport" class="btn primary">Export all</button>
+        </div>
+      </section>
+
+      <section class="card export" aria-labelledby="exportTitle">
+        <div class="card-head"><h2 id="exportTitle">Export</h2></div>
+        <div class="export-grid">
+          <button type="button" class="export-btn primary" data-format="icns"><span class="t">macOS icon</span><span class="d">.icns, 16 to 1024 px</span></button>
+          <button type="button" class="export-btn" data-format="iconset"><span class="t">Iconset</span><span class="d">.iconset folder</span></button>
+          <button type="button" class="export-btn" data-format="ico"><span class="t">Windows icon</span><span class="d">.ico, 16 to 256 px</span></button>
+          <button type="button" class="export-btn" data-format="png"><span class="t">PNG</span><span class="d" data-size-label>1024 px</span></button>
+          <button type="button" class="export-btn" data-format="jpg"><span class="t">JPG</span><span class="d" data-size-label>1024 px</span></button>
+          <button type="button" class="export-btn" data-format="pngset"><span class="t">PNG sizes</span><span class="d">9 sizes in a ZIP</span></button>
+          <button type="button" class="export-btn" data-format="favicon"><span class="t">Favicons</span><span class="d">ico, touch, tiles</span></button>
+          <button type="button" class="export-btn" data-format="xcode"><span class="t">Xcode</span><span class="d">iOS, watchOS, macOS</span></button>
+          <button type="button" class="export-btn" data-format="android"><span class="t">Android</span><span class="d">Launcher, Play Store</span></button>
+          <button type="button" class="export-btn" data-format="all"><span class="t">Everything</span><span class="d">All formats, one ZIP</span></button>
+        </div>
+        <div class="row export-row">
+          <label class="inline-field">PNG and JPG size
+            <select data-setting="exportSize" data-type="number">
+              <option value="16">16 px</option><option value="32">32 px</option><option value="64">64 px</option>
+              <option value="128">128 px</option><option value="256">256 px</option><option value="512">512 px</option>
+              <option value="1024">1024 px</option><option value="2048">2048 px</option>
+            </select>
+          </label>
+          <label class="inline-field">JPG background <input type="color" data-setting="jpgBg"></label>
+          <button type="button" id="copyBtn" class="btn">Copy image</button>
+        </div>
+        <p class="hint">Apply on a Mac: choose Copy image, select a file or folder in Finder, press ⌘I, click the small icon at the top of the window, then press ⌘V. To restore the original, click that icon and press Delete.</p>
+      </section>
+    </div>
+
+    <aside class="inspector" aria-label="Icon settings">
+      <details class="panel" open>
+        <summary>Template</summary>
+        <div class="panel-body">
+          <div id="templateGrid"></div>
+          <div class="field" data-show="template=folder">
+            <span class="field-label">Folder colour</span>
+            <div class="swatches" data-swatch-target="folderColor"></div>
+            <label class="inline-field">Custom <input type="color" data-setting="folderColor"></label>
+          </div>
+          <div class="field" data-show="template=folder">
+            <span class="field-label" id="folderStyleLabel">Symbol</span>
+            <div class="seg" role="radiogroup" aria-labelledby="folderStyleLabel">
+              <label><input type="radio" name="folderStyle" value="auto" data-setting="folderStyle"><span>Auto</span></label>
+              <label><input type="radio" name="folderStyle" value="emboss" data-setting="folderStyle"><span>Embossed</span></label>
+              <label><input type="radio" name="folderStyle" value="colour" data-setting="folderStyle"><span>Full colour</span></label>
+            </div>
+          </div>
+          <div class="field" data-show="template=android">
+            <span class="field-label" id="maskLabel">Launcher mask</span>
+            <div class="seg" role="radiogroup" aria-labelledby="maskLabel">
+              <label><input type="radio" name="androidMask" value="circle" data-setting="androidMask"><span>Circle</span></label>
+              <label><input type="radio" name="androidMask" value="squircle" data-setting="androidMask"><span>Squircle</span></label>
+              <label><input type="radio" name="androidMask" value="rounded" data-setting="androidMask"><span>Rounded</span></label>
+              <label><input type="radio" name="androidMask" value="teardrop" data-setting="androidMask"><span>Teardrop</span></label>
+            </div>
+          </div>
+          <p class="hint" data-show="template=ios,watchos">Xcode export saves these full-bleed and opaque. The system applies the mask.</p>
+          <label class="switch"><input type="checkbox" data-setting="shadow"><span>Shadow</span></label>
+        </div>
+      </details>
+
+      <details class="panel" open>
+        <summary>Artwork</summary>
+        <div class="panel-body">
+          <div class="seg seg-wide" role="radiogroup" aria-label="Artwork source">
+            <label><input type="radio" name="source" value="image" data-setting="source"><span>Image</span></label>
+            <label><input type="radio" name="source" value="glyph" data-setting="source"><span>Emoji or text</span></label>
+          </div>
+          <div class="field" data-show="source=glyph">
+            <label class="field-label" for="glyphInput">Emoji or text</label>
+            <input id="glyphInput" type="text" maxlength="12" data-setting="glyph" autocomplete="off">
+            <div class="row">
+              <label class="inline-field">Font
+                <select data-setting="glyphFont">
+                  <option value="system">System</option><option value="rounded">Rounded</option>
+                  <option value="serif">Serif</option><option value="mono">Mono</option>
+                </select>
+              </label>
+              <label class="inline-field">Text colour <input type="color" data-setting="glyphColor"></label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label" id="fitLabel">Fit</span>
+            <div class="seg" role="radiogroup" aria-labelledby="fitLabel">
+              <label><input type="radio" name="fit" value="contain" data-setting="fit"><span>Fit</span></label>
+              <label><input type="radio" name="fit" value="cover" data-setting="fit"><span>Fill</span></label>
+            </div>
+          </div>
+          <div class="range"><label for="r-scale">Scale</label><output data-for="scale" data-unit="%"></output><input id="r-scale" type="range" min="20" max="200" step="1" data-setting="scale"></div>
+          <div class="range"><label for="r-ox">Move sideways</label><output data-for="offsetX"></output><input id="r-ox" type="range" min="-50" max="50" step="1" data-setting="offsetX"></div>
+          <div class="range"><label for="r-oy">Move up or down</label><output data-for="offsetY"></output><input id="r-oy" type="range" min="-50" max="50" step="1" data-setting="offsetY"></div>
+          <button type="button" class="btn small" id="recentre">Reset position and scale</button>
+        </div>
+      </details>
+
+      <details class="panel" open>
+        <summary>Background</summary>
+        <div class="panel-body">
+          <div class="seg seg-wide" role="radiogroup" aria-label="Background type">
+            <label><input type="radio" name="bgType" value="none" data-setting="bgType"><span>None</span></label>
+            <label><input type="radio" name="bgType" value="solid" data-setting="bgType"><span>Solid</span></label>
+            <label><input type="radio" name="bgType" value="gradient" data-setting="bgType"><span>Gradient</span></label>
+          </div>
+          <div class="field" data-show="bgType=solid,gradient">
+            <div class="swatches" data-swatch-target="colorA"></div>
+            <div class="row">
+              <label class="inline-field"><span data-show="bgType=gradient">Top</span><span data-show="bgType=solid">Colour</span> <input type="color" data-setting="colorA"></label>
+              <label class="inline-field" data-show="bgType=gradient">Bottom <input type="color" data-setting="colorB"></label>
+            </div>
+          </div>
+          <p class="hint" data-show="bgType=none">Templates that need a surface, such as iOS or Badge, use a default colour.</p>
+        </div>
+      </details>
+
+      <details class="panel">
+        <summary>Adjust image</summary>
+        <div class="panel-body">
+          <div class="range"><label for="r-br">Brightness</label><output data-for="brightness"></output><input id="r-br" type="range" min="-100" max="100" data-setting="brightness"></div>
+          <div class="range"><label for="r-co">Contrast</label><output data-for="contrast"></output><input id="r-co" type="range" min="-100" max="100" data-setting="contrast"></div>
+          <div class="range"><label for="r-sa">Saturation</label><output data-for="saturation"></output><input id="r-sa" type="range" min="-100" max="100" data-setting="saturation"></div>
+          <div class="range"><label for="r-hu">Hue</label><output data-for="hue" data-unit="°"></output><input id="r-hu" type="range" min="-180" max="180" data-setting="hue"></div>
+          <label class="switch"><input type="checkbox" data-setting="removeBg"><span>Remove background</span></label>
+          <div data-show="removeBg=true">
+            <div class="range"><label for="r-tol">Tolerance</label><output data-for="bgTolerance"></output><input id="r-tol" type="range" min="0" max="80" data-setting="bgTolerance"></div>
+            <div class="range"><label for="r-soft">Edge softness</label><output data-for="bgSoftness"></output><input id="r-soft" type="range" min="0" max="60" data-setting="bgSoftness"></div>
+            <p class="hint">Removes a flat colour that touches the edges of the image.</p>
+          </div>
+          <label class="switch"><input type="checkbox" data-setting="trim"><span>Trim empty edges</span></label>
+          <button type="button" class="btn small" id="resetTuning">Reset adjustments</button>
+        </div>
+      </details>
+
+      <details class="panel">
+        <summary>Label</summary>
+        <div class="panel-body">
+          <label class="field-label" for="labelInput">Text or emoji</label>
+          <input id="labelInput" type="text" maxlength="40" data-setting="label" placeholder="For example: Invoices" autocomplete="off">
+          <div class="field">
+            <span class="field-label" id="labelPosLabel">Position</span>
+            <div class="seg" role="radiogroup" aria-labelledby="labelPosLabel">
+              <label><input type="radio" name="labelPos" value="top" data-setting="labelPos"><span>Top</span></label>
+              <label><input type="radio" name="labelPos" value="middle" data-setting="labelPos"><span>Middle</span></label>
+              <label><input type="radio" name="labelPos" value="bottom" data-setting="labelPos"><span>Bottom</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label" id="labelStyleLabel">Style</span>
+            <div class="seg" role="radiogroup" aria-labelledby="labelStyleLabel">
+              <label><input type="radio" name="labelStyle" value="pill" data-setting="labelStyle"><span>Pill</span></label>
+              <label><input type="radio" name="labelStyle" value="plain" data-setting="labelStyle"><span>Plain</span></label>
+            </div>
+          </div>
+          <div class="range"><label for="r-ls">Size</label><output data-for="labelSize"></output><input id="r-ls" type="range" min="5" max="30" data-setting="labelSize"></div>
+          <div class="row">
+            <label class="inline-field">Font
+              <select data-setting="labelFont">
+                <option value="system">System</option><option value="rounded">Rounded</option>
+                <option value="serif">Serif</option><option value="mono">Mono</option>
+              </select>
+            </label>
+            <label class="inline-field">Text <input type="color" data-setting="labelColor"></label>
+            <label class="inline-field" data-show="labelStyle=pill">Pill <input type="color" data-setting="labelBg"></label>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel">
+        <summary>Overlay</summary>
+        <div class="panel-body">
+          <div class="seg seg-wide" role="radiogroup" aria-label="Overlay">
+            <label><input type="radio" name="overlay" value="none" data-setting="overlay"><span>None</span></label>
+            <label><input type="radio" name="overlay" value="alias" data-setting="overlay"><span>Alias arrow</span></label>
+            <label><input type="radio" name="overlay" value="badge" data-setting="overlay"><span>Badge</span></label>
+          </div>
+          <div data-show="overlay=badge">
+            <label class="field-label" for="badgeInput">Badge text or emoji</label>
+            <input id="badgeInput" type="text" maxlength="4" data-setting="badgeText" autocomplete="off">
+            <div class="row">
+              <label class="inline-field">Colour <input type="color" data-setting="badgeColor"></label>
+              <label class="inline-field">Text <input type="color" data-setting="badgeTextColor"></label>
+              <label class="inline-field">Corner
+                <select data-setting="badgeCorner">
+                  <option value="br">Bottom right</option><option value="bl">Bottom left</option>
+                  <option value="tr">Top right</option><option value="tl">Top left</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <p class="footnote">Open source under the MIT licence. Everything runs in this browser tab. Nothing is uploaded.</p>
+    </aside>
+  </main>
+
+  <div id="dropOverlay" class="drop-overlay" hidden><div>Drop images to add them</div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="src/encoders.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/exporters.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
